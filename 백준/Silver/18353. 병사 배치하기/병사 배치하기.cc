@@ -24,7 +24,7 @@ int main()
         }
  
         else {
-            *upper_bound(lis.begin(), lis.end(), soldiers[i], greater<int>()) = soldiers[i];
+            *lower_bound(lis.begin(), lis.end(), soldiers[i], greater<int>()) = soldiers[i];
         }
     }
 
