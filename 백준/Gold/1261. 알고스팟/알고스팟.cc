@@ -8,8 +8,8 @@ int M, N;
 int dx[4] = { 1,-1,0,0 };
 int dy[4] = { 0,0,1,-1 };
 
-int d[103][103];
-string board[102];
+int d[100][100];
+string board[100];
 int answer = 1e9;
 queue<pair<int, int>> q;
 
