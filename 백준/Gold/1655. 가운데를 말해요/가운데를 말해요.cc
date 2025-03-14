@@ -1,47 +1,51 @@
 #include <iostream>
 #include <queue>
+#include <vector>
+#define fastio() ios::sync_with_stdio(0), cin.tie(0), cout.tie(0)
+
 using namespace std;
 
-void findMedian(int N) 
+int N;
+priority_queue<int> maxHeap;  
+priority_queue<int, vector<int>, greater<int>> minHeap; 
+
+void makeHeap()
 {
-    priority_queue<int> leftMaxHeap; // 최대 힙 (중간값 포함, 작은 수 저장)
-    priority_queue<int, vector<int>, greater<int>> rightMinHeap; // 최소 힙 (큰 수 저장)
-
     int num;
-    for (int i = 0; i < N; i++) 
+    cin >> num;
+
+    if (maxHeap.empty() || num <= maxHeap.top())
     {
-        cin >> num;
-
-        // 최대 힙이 비었거나, num이 최대 힙의 top보다 작다면 최대 힙에 삽입
-        if (leftMaxHeap.empty() || num <= leftMaxHeap.top()) {
-            leftMaxHeap.push(num);
-        }
-        else {
-            rightMinHeap.push(num);
-        }
-
-        // 균형 조정 (최대 힙 크기가 최소 힙 크기보다 2 이상 크면 조정)
-        if (leftMaxHeap.size() > rightMinHeap.size() + 1) {
-            rightMinHeap.push(leftMaxHeap.top());
-            leftMaxHeap.pop();
-        }
-        else if (rightMinHeap.size() > leftMaxHeap.size()) {
-            leftMaxHeap.push(rightMinHeap.top());
-            rightMinHeap.pop();
-        }
-
-        // 중간값 출력 (항상 최대 힙의 top이 중간값)
-        cout << leftMaxHeap.top() << "\n";
+        maxHeap.push(num);
     }
+    else
+    {
+        minHeap.push(num);
+    }
+
+    if (maxHeap.size() > minHeap.size() + 1)
+    {
+        minHeap.push(maxHeap.top());
+        maxHeap.pop();
+    }
+    else if (minHeap.size() > maxHeap.size())
+    {
+        maxHeap.push(minHeap.top());
+        minHeap.pop();
+    }
+
+    cout << maxHeap.top() << "\n";
 }
 
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(0);
-
-    int N;
+int main()
+{
+    fastio();
     cin >> N;
-    findMedian(N);
+
+    for (int i = 0; i < N; i++)  
+    {
+        makeHeap();
+    }
 
     return 0;
 }
