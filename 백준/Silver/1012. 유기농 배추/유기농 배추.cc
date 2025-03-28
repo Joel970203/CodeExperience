@@ -1,73 +1,79 @@
+#include <vector>
+#include <algorithm>
 #include <iostream>
 #include <queue>
 #include <cstring>
+
 #define fastio() ios::sync_with_stdio(0),cin.tie(0),cout.tie(0)
+
 using namespace std;
 
+bool visited[50][50] = { false };
 int dx[4] = { 1,-1,0,0 };
 int dy[4] = { 0,0,1,-1 };
-int cnt = 0;
-int T, M, N, K, x, y;
-int farm[50][50];
-int visited[50][50];
-queue<pair<int, int>> q;
+int M, N;
 
-void BFS(int x, int y)
+void bfs(const vector<vector<int>> &graph,int y,int x)
 {
-	q.push({ x,y });
-	visited[x][y] = 1;
+	queue<pair<int, int>> q;
+	q.push({ y,x });
+	visited[y][x] = true;
+
 	while (!q.empty())
 	{
-		int tempX = q.front().first;
-		int tempY = q.front().second;
+		int tempX = q.front().second;
+		int tempY = q.front().first;
 		q.pop();
 
-		for (int a = 0; a < 4; a++)
+		for (int i = 0; i < 4; i++)
 		{
-			int newX = tempX + dx[a];
-			int newY = tempY + dy[a];
+			int curX = tempX + dx[i];
+			int curY = tempY + dy[i];
 
-			if (newX >= 0 && newX < N && newY >= 0 && newY < M)
+			if (curX >= 0 && curX < M && curY >= 0 && curY < N)
 			{
-				if (visited[newX][newY] == 0 && farm[newX][newY] == 1)
+				if (!visited[curY][curX] && graph[curY][curX] == 1)
 				{
-					q.push({ newX,newY });
-					visited[newX][newY] = 1;
+					visited[curY][curX] = true;
+					q.push({ curY,curX });
 				}
 			}
 		}
 	}
+	return;
 }
+
 int main()
 {
-	fastio();
+	int T,K, x, y;
 	cin >> T;
+
 	while (T--)
 	{
-		memset(farm, 0, sizeof(farm));
-		memset(visited, 0, sizeof(visited));
-		cin >> M >> N >> K;
 		int cnt = 0;
+		cin >> M >> N >> K;
+		vector<vector<int>> graph(N, vector<int>(M, 0));
+		memset(visited, 0, sizeof(visited));
+
 		while (K--)
 		{
-			cin >> y >> x;
-			farm[x][y] = 1;
+			cin >> x >> y;
+			graph[y][x] = 1;
 		}
-
-		
 
 		for (int i = 0; i < N; i++)
 		{
 			for (int j = 0; j < M; j++)
 			{
-				if (farm[i][j] == 1 && visited[i][j] == 0)
+				if (graph[i][j] == 1 && !visited[i][j])
 				{
-					BFS(i, j);
+					bfs(graph,i, j);
 					cnt++;
 				}
 			}
 		}
+
 		cout << cnt << endl;
 	}
-	return 0;
+
 }
