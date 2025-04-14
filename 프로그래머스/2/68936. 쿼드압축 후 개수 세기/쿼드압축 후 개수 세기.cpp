@@ -3,42 +3,50 @@
 
 using namespace std;
 
-void quad(int y,int x,const vector<vector<int>> &arr, vector<int> &answer,int cnt)
+
+
+void recursive(const vector<vector<int>> &arr,vector<int> &answer,int offset,int y,int x)
 {
     bool isSame = true;
-    int check = arr[y][x]; 
-    for(int i=y;i<y+cnt;i++)
+    int chk = arr[y][x];
+    for(int i=y;i<y+offset;i++)
     {
-        for(int j=x;j<x+cnt;j++)
+        for(int j=x;j<x+offset;j++)
         {
-            if(arr[i][j] != check)
+            if(arr[i][j] != chk)
             {
                 isSame = false;
+            }
+            
+            if(!isSame)
+            {
                 break;
             }
         }
-        if(!isSame) break;
+        if(!isSame)
+        {
+            break;
+        }
     }
     
     if(isSame)
     {
-        answer[check] += 1;
+        answer[chk]++;
         return;
     }
     
+    offset /= 2;
     
-    int div = cnt/2;
-    
-    quad(y,x,arr,answer,div);
-    quad(y,x+div,arr,answer,div);
-    quad(y+div,x,arr,answer,div);
-    quad(y+div,x+div,arr,answer,div);
+    recursive(arr,answer,offset,y,x);
+    recursive(arr,answer,offset,y+offset,x);
+    recursive(arr,answer,offset,y,x+offset);
+    recursive(arr,answer,offset,y+offset,x+offset);
 }
 
 vector<int> solution(vector<vector<int>> arr) 
 {
-    int cnt = arr.size();
-    vector<int> answer(2,0);
-    quad(0,0,arr,answer,cnt);
+    vector<int> answer = {0,0};
+    int offset = arr.size();
+    recursive(arr,answer,offset,0,0);
     return answer;
 }
