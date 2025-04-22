@@ -1,41 +1,36 @@
 #include <string>
 #include <cctype>  
+#include <vector>
 using namespace std;
 
 string solution(string s) 
 {
-    bool isFirst = true;
-    for(int i = 0; i < s.length(); i++)
+    vector<int> arr;
+    bool trigger = false;
+
+    for (int i = 0; i < s.length(); i++)
     {
-        
-        if(!isFirst)
+        if (isspace(s[i]))
         {
-            if(isupper(s[i]))
-            {
-                s[i] = tolower(s[i]);
-                
-            }
-            
+            trigger = true;
+            continue;
         }
-        
-        if(isFirst)
+
+        if (isupper(s[i]) && trigger == false)
         {
-            if(islower(s[i]))
+            s[i] = tolower(s[i]); 
+        }
+
+        if (trigger || i == 0)
+        {
+            if (islower(s[i]))
             {
                 s[i] = toupper(s[i]);
-                
             }
-            
-            isFirst = false;
-        }
-        
-        
 
-        
-        if(s[i] == ' ')
-        {
-            isFirst = true;
+            trigger = false;
         }
     }
+    
     return s;
 }
