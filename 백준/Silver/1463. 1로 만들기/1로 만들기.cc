@@ -1,29 +1,31 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-#define fastio() ios::sync_with_stdio(0),cin.tie(0),cout.tie(0)
+#include <algorithm>
 
 using namespace std;
 
-int main() {
-    fastio();
-    int N;
-    cin >> N;
-    vector<int> dp(N + 1, 0);
+int main()
+{
+	int N;
+	cin >> N;
 
-    for (int i = 2; i <= N; ++i) {
-        // 기본적으로 i-1을 계산
-        dp[i] = dp[i - 1] + 1;
-        // i가 2로 나누어 떨어지면
-        if (i % 2 == 0) {
-            dp[i] = min(dp[i], dp[i / 2] + 1);
-        }
-        // i가 3으로 나누어 떨어지면
-        if (i % 3 == 0) {
-            dp[i] = min(dp[i], dp[i / 3] + 1);
-        }
-    }
+	vector<int> DP(N + 1, 0);
 
-    cout << dp[N] << endl;
-    return 0;
+	for (int i = N-1; i >= 1; i--)
+	{
+		if (i * 3 <= N)
+		{
+			DP[i] = min(DP[i+1],min(DP[i * 3], DP[i * 2]))+1;
+		}
+
+		else if (i * 2 <= N)
+		{
+			DP[i] = min(DP[i * 2], DP[i + 1]) + 1;
+		}
+
+		else
+			DP[i] = DP[i + 1] + 1;
+	}
+
+	cout << DP[1] << endl;
 }
