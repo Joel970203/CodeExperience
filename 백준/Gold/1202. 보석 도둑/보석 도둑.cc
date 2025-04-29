@@ -4,6 +4,8 @@
 #include <algorithm>
 #define fastio() ios::sync_with_stdio(0), cin.tie(0), cout.tie(0)
 using namespace std;
+// 배낭문제가 아니다
+// 가방은 여러개이고, 보석은 한개만 넣을수있음
 
 int main()
 {
@@ -12,12 +14,14 @@ int main()
     int N, K;
     cin >> N >> K;
 
-    vector<pair<int, int>> jewels(N);  // {무게, 가격}
+    vector<pair<int, int>> jewels;  // 무게 가격 
     vector<int> bags(K);
 
-    for (int i = 0; i < N; i++) 
+    for (int i = 0; i < N; i++)
     {
-        cin >> jewels[i].first >> jewels[i].second;
+        int M, V;
+        cin >> M >> V;
+        jewels.push_back({ M,V });
     }
 
     for (int i = 0; i < K; i++)
@@ -25,27 +29,33 @@ int main()
         cin >> bags[i];
     }
 
-    sort(jewels.begin(), jewels.end());
+    sort(jewels.begin(), jewels.end()); // 무게로 정렬 
 
-    sort(bags.begin(), bags.end());
+    sort(bags.begin(), bags.end()); // 가방도 무게로 정렬 
 
-    priority_queue<int> pq; 
-    long long maxValue = 0;
+    /*
+    작은 가방부터, 하나씩 넣어본다.
+    */
+
+    priority_queue<int> pq;
+    long long answer = 0;
     int j = 0;
 
-    for (int i = 0; i < K; i++) {
-        // 가방에 담을 수 있는 보석들을 힙에 삽입
-        while (j < N && jewels[j].first <= bags[i]) {
-            pq.push(jewels[j].second);  
+    for (int i = 0; i < K; i++) 
+    {
+        while (j < N && jewels[j].first <= bags[i]) // 보석 넣을수있다면 
+        {
+            pq.push(jewels[j].second);
             j++;
         }
 
-        if (!pq.empty()) {
-            maxValue += pq.top();
+        if (!pq.empty()) 
+        {
+            answer += pq.top();
             pq.pop();
         }
     }
 
-    cout << maxValue << "\n";
+    cout << answer << "\n";
     return 0;
 }
