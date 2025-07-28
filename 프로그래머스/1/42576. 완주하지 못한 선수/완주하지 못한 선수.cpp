@@ -1,26 +1,29 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+
+
 using namespace std;
 
-string solution(vector<string> participant, vector<string> completion) {
+string solution(vector<string> participant, vector<string> completion) 
+{
+    unordered_map<string,int> u_map;
     
-    string answer = "";
-    unordered_map<string,int> part;
-    for (const auto& name : participant) {
-        part[name]++;
+    for(int i=0;i<participant.size();i++)
+    {
+        u_map[participant[i]]++;
     }
     
-    for (const auto& name : completion) {
-        part[name]--;
+    for(int i=0;i<completion.size();i++)
+    {
+        u_map[completion[i]]--;
     }
     
-    for (const auto& name : part) {
-        if (name.second > 0) {  // 완주하지 못한 참가자 찾기
-            answer = name.first;
-            break;
+    for(const auto& cursor : u_map)
+    {
+        if(cursor.second > 0)
+        {
+            return cursor.first;
         }
     }
-    
-    return answer;
 }
