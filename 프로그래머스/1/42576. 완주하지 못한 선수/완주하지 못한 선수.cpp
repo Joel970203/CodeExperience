@@ -2,28 +2,29 @@
 #include <vector>
 #include <unordered_map>
 
-
 using namespace std;
 
 string solution(vector<string> participant, vector<string> completion) 
 {
-    unordered_map<string,int> u_map;
-    
-    for(int i=0;i<participant.size();i++)
+    string answer;
+    unordered_map<string,int> umap;
+    for(const auto &cur : participant)
     {
-        u_map[participant[i]]++;
+        umap[cur]++;
     }
     
-    for(int i=0;i<completion.size();i++)
+    for(const auto &cur : completion)
     {
-        u_map[completion[i]]--;
+        umap[cur]--;
     }
     
-    for(const auto& cursor : u_map)
+    for(const auto &cur :umap)
     {
-        if(cursor.second > 0)
+        if(cur.second == 1)
         {
-            return cursor.first;
+            return cur.first;
         }
     }
+    
+    
 }
