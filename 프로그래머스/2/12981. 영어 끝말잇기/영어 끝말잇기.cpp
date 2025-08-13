@@ -1,30 +1,64 @@
 #include <string>
 #include <vector>
-#include <unordered_set>
+#include <iostream>
+#include <unordered_map>
+
 using namespace std;
 
-vector<int> solution(int n, vector<string> words) {
+vector<int> solution(int n, vector<string> words) 
+{
     vector<int> answer;
-    unordered_set<string> used;
-
-    for(int i = 0; i < words.size(); i++) {
-        if(i > 0 && words[i][0] != words[i-1].back()) 
+    unordered_map<string,int> umap;
+    int turn = 0;
+    int round = 1;
+    char temp = '0';
+    
+    for(auto &cur : words)
+    {
+        turn++;
+        if(turn > n)
         {
-            answer.push_back((i % n) + 1);      // 사람 번호 (1부터 시작)
-            answer.push_back((i / n) + 1);      // 몇 번째 차례
-            return answer;
+            turn = turn%n;
+            round++;
+        }
+        
+        if(temp == '0') // 맨처음
+        {
+            temp = cur[cur.length()-1];
+            umap[cur]++;
+        }
+        
+        else // 맨처음 아닐때 
+        {
+            if(cur[0] == temp)
+            {
+                temp = cur[cur.length()-1];
+                if(umap[cur] == 0)
+                {
+                    umap[cur]++;
+                }
+                else
+                {
+                    answer.push_back(turn);
+                    answer.push_back(round);
+
+                    return answer;
+                }
+            }
+            
+            else
+            {
+                answer.push_back(turn);
+                answer.push_back(round);
+                return answer;
+            }
         }
 
-        // 중복 단어 사용
-        if(used.count(words[i]))
-        {
-            answer.push_back((i % n) + 1);
-            answer.push_back((i / n) + 1);
-            return answer;
-        }
-
-        used.insert(words[i]);
     }
-
-    return {0, 0};
+    
+    answer.push_back(0);
+    answer.push_back(0);
+    
+    return answer;
+    
 }
