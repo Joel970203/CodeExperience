@@ -1,45 +1,44 @@
 #include <string>
+#include <unordered_map>
 #include <vector>
-#include <map>
-#include <algorithm>
-
 using namespace std;
 
-int solution(vector<string> want, vector<int> number, vector<string> discount) {
+unordered_map<string,int> cloneMap(const unordered_map<string,int>& src)
+{
+    return src; 
+}
+
+int solution(vector<string> want, vector<int> number, vector<string> discount) 
+{
+    unordered_map<string,int> need;
+    for (size_t i = 0; i < want.size(); ++i)
+        need[want[i]] = number[i];
+
+    if (discount.size() < 10) return 0;
+
     int answer = 0;
-    int n = want.size();
-    int m = discount.size();  
 
-    map<string, int> want_count;
-    for (int i = 0; i < n; i++) 
+    for (size_t i = 0; i + 9 < discount.size(); ++i)
     {
-        want_count[want[i]] = number[i];
-    }
+        bool buy = true; 
+        auto cur = cloneMap(need); 
 
-    for (int i = 0; i <= m - 10; i++) 
-    {
-        map<string, int> discount_count;
-        
-        for (int j = i; j < i + 10; j++)
+        for (size_t j = i; j <= i + 9; ++j) 
         {
-            discount_count[discount[j]]++;
+            if (cur.count(discount[j]))  
+                --cur[discount[j]];
         }
-        
-        bool valid = true;
-        
-        for (auto& item : want_count) 
+
+        for (const auto& p : cur) 
         {
-            if (discount_count[item.first] < item.second) 
-            {
-                valid = false;
+            if (p.second > 0) 
+            { 
+                buy = false;
                 break;
             }
         }
-        if (valid) 
-        {
-            answer++;
-        }
-    }
 
+        if (buy) ++answer;
+    }
     return answer;
 }
