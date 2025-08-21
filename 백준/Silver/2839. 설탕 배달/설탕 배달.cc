@@ -1,30 +1,25 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-
+#include <algorithm>
 using namespace std;
 
-int main()
+int main() 
 {
     int N;
     cin >> N;
 
-    vector<int> DP(N + 1, -1);
+    vector<int> dp(N + 1, 1e9);
+    dp[3] = 1;
+    if (N >= 5) dp[5] = 1;
 
-    DP[3] = 1;
-    DP[5] = 1;
-
-    for (int i = 6; i <= N; i++)
+    for (int i = 6; i <= N; i++) 
     {
-        if (DP[i - 3] != -1 && DP[i - 5] != -1)
-            DP[i] = min(DP[i - 3], DP[i - 5]) + 1;
-        else if (DP[i - 3] != -1)
-            DP[i] = DP[i - 3] + 1;
-        else if (DP[i - 5] != -1)
-            DP[i] = DP[i - 5] + 1;
+        if (dp[i - 3] != 1e9) dp[i] = min(dp[i], dp[i - 3] + 1);
+        if (dp[i - 5] != 1e9) dp[i] = min(dp[i], dp[i - 5] + 1);
     }
 
-    cout << DP[N] << endl;
+    if (dp[N] == 1e9) cout << -1;
+    else cout << dp[N];
 
     return 0;
 }
