@@ -1,64 +1,60 @@
 #include <iostream>
-#include <queue>
 #include <vector>
-#include <climits>
+#include <queue>
+#include <algorithm>
+#define INF 1e9
 using namespace std;
 
-vector<int> dijkstra(int N, const vector<vector<pair<int, int>>>& graph, int start) {
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    vector<int> dist(N + 1, INT_MAX);
-    pq.push({ 0, start });
+vector<int> dijkstra(const vector<vector<pair<int,int>>> &graph, int start, int N) {
+    vector<int> dist(N+1, INF);
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
+
     dist[start] = 0;
+    pq.push({0, start}); // {cost, node}
 
     while (!pq.empty()) {
-        int currDist = pq.top().first;
-        int currPos = pq.top().second;
-        pq.pop();
+        auto [cost, node] = pq.top(); pq.pop();
 
-        if (currDist > dist[currPos])
-            continue;
+        if (cost > dist[node]) continue;
 
-        for (auto& road : graph[currPos]) {
-            int nextPos = road.first;
-            int shortcutDist = road.second;
-
-            if (dist[nextPos] > currDist + shortcutDist) {
-                dist[nextPos] = currDist + shortcutDist;
-                pq.push({ dist[nextPos], nextPos });
+        for (auto [w, next] : graph[node]) {
+            if (dist[next] > cost + w) {
+                dist[next] = cost + w;
+                pq.push({dist[next], next});
             }
         }
     }
-
     return dist;
 }
 
 int main() {
-    int N, M, X;
-    cin >> N >> M >> X;
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-    vector<vector<pair<int, int>>> graph(N + 1);
-    vector<vector<pair<int, int>>> reverseGraph(N + 1);
+    int N, M, X; 
+    cin >> N >> M >> X; // N=학생 수(마을), M=도로 수, X=파티 장소
+
+    vector<vector<pair<int,int>>> graph(N+1);
+    vector<vector<pair<int,int>>> rev_graph(N+1);
 
     for (int i = 0; i < M; i++) {
-        int a, b, c;
-        cin >> a >> b >> c;
-        graph[a].push_back({ b, c });
-        reverseGraph[b].push_back({ a, c }); // 역방향 그래프 생성
+        int u, v, w;
+        cin >> u >> v >> w;
+        graph[u].push_back({w, v});     // 정방향
+        rev_graph[v].push_back({w, u}); // 역방향
     }
 
-    // X에서 모든 노드로의 최단 거리
-    vector<int> distFromX = dijkstra(N, graph, X);
-    // 모든 노드에서 X로의 최단 거리
-    vector<int> distToX = dijkstra(N, reverseGraph, X);
+    // X → i
+    vector<int> dist_from_X = dijkstra(graph, X, N);
 
-    int maxTime = 0;
+    // i → X (역그래프에서 X 출발하면 됨)
+    vector<int> dist_to_X = dijkstra(rev_graph, X, N);
+
+    int answer = 0;
     for (int i = 1; i <= N; i++) {
-        if (i == X) continue;
-        int roundTripTime = distFromX[i] + distToX[i];
-        maxTime = max(maxTime, roundTripTime);
+        if (dist_from_X[i] == INF || dist_to_X[i] == INF) continue;
+        answer = max(answer, dist_from_X[i] + dist_to_X[i]);
     }
 
-    cout << maxTime << endl;
-
-    return 0;
+    cout << answer << "\n";
 }
