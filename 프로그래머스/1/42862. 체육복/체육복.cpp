@@ -1,33 +1,54 @@
-#include <bits/stdc++.h>
+#include <string>
+#include <vector>
+#include <algorithm>
+
 using namespace std;
 
-int student[31];
-
-int solution(int n, vector<int> lost, vector<int> reserve) {
+int solution(int n, vector<int> lost, vector<int> reserve)
+{
     int answer = 0;
     
-    for(int i = 0; i < lost.size(); i++){
-        student[lost[i]]--;
+    vector<pair<int,int>> students(n+1);
+    students[0]={0,0};
+    
+    for(int i=1;i<=n;++i)
+    {
+        students[i] = {i,1};
     }
     
-    for(int i = 0; i < reserve.size(); i++){
-        student[reserve[i]]++;
+    for(int i=0;i<lost.size();++i)
+    {
+        students[lost[i]].second--;
+    }
+
+    for(int i=0;i<reserve.size();++i)
+    {
+        students[reserve[i]].second++;
     }
     
-    for(int i = 1; i <= n; i++){
-        if(student[i] == -1){
-            if(student[i - 1] == 1){
-                student[i - 1] = 0;
-                student[i] = 0;
+    for(int i=1;i<students.size();++i)
+    {
+        if(students[i].second == 0)
+        {
+            if(students[i-1].second >= 2)
+            {
+                students[i-1].second--;
+                students[i].second++;
             }
-            else if(student[i + 1] == 1){
-                student[i + 1] = 0;
-                student[i] = 0;
+
+            else if(students[i+1].second >= 2)
+            {
+                students[i+1].second--;
+                students[i].second++;
             }
-        }   
-            
-        if(student[i] >= 0) answer++;
+        }
     }
+    
+    for(int i=1;i<=students.size();++i)
+    {
+        if(students[i].second >= 1) answer++;
+    }
+    
     
     return answer;
 }
