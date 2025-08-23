@@ -1,26 +1,20 @@
-#include <string>
 #include <vector>
-
 using namespace std;
 
-int total = 0;
+int answer;
 
-void DFS(vector<int> &numbers, int &target, int cnt, int idx)
+void dfs(const vector<int>& numbers, int idx, int sum, int target)
 {
-    if(idx >= numbers.size())
-    {
-        if(cnt == target) total++;
+    if (idx == (int)numbers.size()) {
+        if (sum == target) answer++;
         return;
     }
-    DFS(numbers, target, cnt+numbers[idx], idx+1);
-    DFS(numbers, target, cnt-numbers[idx], idx+1);
+    dfs(numbers, idx + 1, sum + numbers[idx], target);
+    dfs(numbers, idx + 1, sum - numbers[idx], target);
 }
 
 int solution(vector<int> numbers, int target) {
-    int answer = 0;
-    
-    DFS(numbers,target,numbers[0],1);
-    DFS(numbers,target,-numbers[0],1);
-    answer = total;
+    answer = 0;                
+    dfs(numbers, 0, 0, target);
     return answer;
 }
