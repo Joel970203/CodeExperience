@@ -1,69 +1,84 @@
 #include <iostream>
-#include <queue>
 #include <vector>
-
+#include <queue>
+#include <algorithm>
+#include <climits>
 using namespace std;
+// 2:55 풀이 시작
 
-const int MAX = 100001;
-vector<int> dist(MAX, MAX); // 각 위치까지의 최소 시간을 저장할 배열
+int BFS(int N, int K)
+{
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
+	pq.push({ 0,N }); // cost,loc
+	bool visited[100001] = { false };
+	visited[N] = true;
 
-void dijkstra(int start, int target) {
+	while (!pq.empty())
+	{
+		int time = pq.top().first; 
+		int pos = pq.top().second;
+		pq.pop();
 
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    dist[start] = 0;
-    pq.push({ 0,start });
+		if (pos == K)
+		{
+			return time;
+		}
 
-    while (!pq.empty())
-    {
-        int currentTime = pq.top().first;
-        int currentLoc = pq.top().second;
-        pq.pop();
-
-        if (currentLoc == target) {
-            return;
-        }
-
-        int nextTime;
-
-
-        if (currentLoc - 1 >= 0) {
-            nextTime = currentTime + 1;
-            if (nextTime < dist[currentLoc - 1]) {
-                dist[currentLoc - 1] = nextTime;
-                pq.push({ nextTime, currentLoc - 1 });
-            }
-        }
-
-        if (currentLoc + 1 < MAX) {
-            nextTime = currentTime + 1;
-            if (nextTime < dist[currentLoc + 1]) {
-                dist[currentLoc + 1] = nextTime;
-                pq.push({ nextTime, currentLoc + 1 });
-            }
-        }
-
-        if (currentLoc * 2 < MAX) {
-            nextTime = currentTime; // 순간이동은 0초
-            if (nextTime < dist[currentLoc * 2]) {
-                dist[currentLoc * 2] = nextTime;
-                pq.push({ nextTime, currentLoc * 2 });
-            }
-        }
-    }
-
+		for (int i=0;i<3;i++)
+		{
+			if (i == 0)
+			{
+				int newpos = pos * 2;
+				if (newpos >= 0 && newpos <= 100000)
+				{
+					if (visited[newpos] == false)
+					{
+						visited[newpos] = true;
+						pq.push({ time,newpos });
+					}
+				}
+			}
+			else if (i == 1)
+			{
+				int newpos = pos +1;
+				if (newpos >= 0 && newpos <= 100000)
+				{
+					if (visited[newpos] == false)
+					{
+						visited[newpos] = true;
+						pq.push({ time+1,newpos });
+					}
+				}
+			}
+			else if (i == 2)
+			{
+				int newpos = pos -1;
+				if (newpos >= 0 && newpos <= 100000)
+				{
+					if (visited[newpos] == false)
+					{
+						visited[newpos] = true;
+						pq.push({ time+1,newpos });
+					}
+				}
+			}
+		}
+	}
 }
+int main()
+{
+	/*
+	입력처리 N,K 
+	졔약 조건, 100000 -> N 타임에 풀것
+	
+	수빈 위치 N
+	동생위치 K 
+	-> BFS XXXXX
 
-int main() {
-    int N, K;
-    cin >> N >> K;
+	이 문제는 가중치가 0과 1이 존재하기 떄문에, 기존 BFS로는 최단이 보장되지않는다.
+	*/
 
-    if (N == K) {
-        cout << 0 << endl;
-    }
-    else {
-        dijkstra(N, K);
-        cout << dist[K] << endl;
-    }
-
-    return 0;
+	int N, K;
+	cin >> N >> K;
+	cout << BFS(N, K);
 }
