@@ -4,32 +4,27 @@
 
 using namespace std;
 
-int main() 
+int main()
 {
-    int n;
-    cin >> n;
+	int N;
+	cin >> N;
+	vector<int> arr;
 
-    vector<int> vec;
+	for (int i = 0; i < N; i++)
+	{
+		int k;
+		cin >> k;
 
-    for (int i = 0; i < n; i++)
-    {
-        int k;
-        cin >> k;
-        vec.push_back(k);
-    }
+		if (arr.empty() || arr.back() < k)
+		{
+			arr.push_back(k);
+		}
 
-    vector<int> dp(n,1);
+		else
+		{
+			*lower_bound(arr.begin(), arr.end(), k) = k;
+		}
+	}
 
-    for (int i = 1; i < n; i++)
-    {
-        for (int j = 0; j < i; j++)
-        {
-            if (vec[j] < vec[i])
-            {
-                dp[i] = max(dp[i], dp[j] + 1);
-            }
-        }
-    }
-
-    cout << *max_element(dp.begin(), dp.end());
+	cout << arr.size();
 }
