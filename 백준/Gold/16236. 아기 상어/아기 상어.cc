@@ -1,92 +1,98 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <climits>
+#include <algorithm>
 using namespace std;
 
-int N;
-vector<vector<int>> graph;
-int sy, sx; // 상어 위치
-int sharkSize = 2, eatCount = 0, totalTime = 0;
+int dy[4] = { 0,1,0,-1 };
+int dx[4] = { -1,0,1,0 }; // 왼쪽 우선, 위쪽은 다음 
 
-// 방향: 위, 왼, 오른, 아래 (우선순위 맞추기 위해 위→왼→오른→아래)
-int dy[4] = {-1, 0, 0, 1};
-int dx[4] = {0, -1, 1, 0};
+int N, M, cnt = 0, sharkSize = 2, fishCnt = 0;
+int sharkY, sharkX;
 
-// BFS로 먹을 물고기 찾기
-pair<int,int> bfs() {
-    vector<vector<int>> dist(N, vector<int>(N, -1));
-    queue<pair<int,int>> q;
-    q.push({sy, sx});
-    dist[sy][sx] = 0;
+struct Fish
+{
+	int y, x, dist;
+};
 
-    int minDist = INT_MAX;
-    pair<int,int> target = {-1, -1};
+Fish bfs(int y, int x, vector<vector<int>> &graph)
+{
+	bool foundFish = false;
+	bool visited[20][20] = {false};
+	queue<Fish> q;
+	q.push({ y,x,0});
+	visited[y][x] = true;
+	
+	vector<Fish> candidates;
+	int minDist = -1;
 
-    while(!q.empty()) {
-        auto [y,x] = q.front(); q.pop();
+	while (!q.empty())
+	{
+		auto [y, x, dist] = q.front();
+		q.pop();
 
-        for(int dir=0; dir<4; dir++) {
-            int ny = y + dy[dir];
-            int nx = x + dx[dir];
+		if (minDist != -1 && dist > minDist) break;
 
-            if(ny<0 || nx<0 || ny>=N || nx>=N) continue;
-            if(dist[ny][nx] != -1) continue;        // 이미 방문
-            if(graph[ny][nx] > sharkSize) continue; // 큰 물고기 못 지나감
+		if (graph[y][x] != 0 && graph[y][x] < sharkSize) {
+			candidates.push_back({ y,x,dist });
+			minDist = dist; 
+		}
 
-            dist[ny][nx] = dist[y][x] + 1;
+		for (int i = 0; i < 4; i++)
+		{
+			int ny = y + dy[i];
+			int nx = x + dx[i];
 
-            // 먹을 수 있는 물고기라면 후보 갱신
-            if(graph[ny][nx] != 0 && graph[ny][nx] < sharkSize) {
-                if(dist[ny][nx] < minDist ||
-                   (dist[ny][nx] == minDist && (ny < target.first ||
-                   (ny == target.first && nx < target.second)))) {
-                    minDist = dist[ny][nx];
-                    target = {ny, nx};
-                }
-            }
+			if (ny >= N || ny < 0 || nx >= N || nx < 0) continue;
+			if (visited[ny][nx]) continue;
+			if (graph[ny][nx] > sharkSize) continue;
+			visited[ny][nx] = true;
+			q.push({ ny,nx,dist + 1 });
+		}
+	}
 
-            q.push({ny, nx});
-        }
-    }
+	if(candidates.empty()) return { -1, -1, -1 };
 
-    if(target.first == -1) return {-1,-1}; // 먹을 수 있는 물고기 없음
-    totalTime += minDist;
-    return target;
+	sort(candidates.begin(), candidates.end(), [](Fish a, Fish b) {
+		if (a.dist != b.dist) return a.dist < b.dist;
+		if (a.y != b.y) return a.y < b.y;
+		return a.x < b.x;
+	});
+
+	auto target = candidates[0];
+	graph[target.y][target.x] = 0; // 먹은 칸은 빈칸 처리
+	return target;
 }
 
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+int main()
+{
+	cin >> N;
+	
+	vector<vector<int>> graph(N, vector<int>(N));
 
-    cin >> N;
-    graph.assign(N, vector<int>(N));
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			cin >> graph[i][j];
+			if (graph[i][j] == 9) {
+				sharkY = i; sharkX = j;
+				graph[i][j] = 0; // 상어 위치는 빈칸으로 초기화
+			}
+		}
+	}
 
-    for(int i=0;i<N;i++) {
-        for(int j=0;j<N;j++) {
-            cin >> graph[i][j];
-            if(graph[i][j] == 9) {
-                sy = i; sx = j;
-                graph[i][j] = 0; // 상어 출발 위치는 빈 칸으로
-            }
-        }
-    }
+	int answer = 0, ate = 0;
+	while (true) {
+		auto [y, x, dist] = bfs(sharkY, sharkX, graph);
+		if (y == -1) break;
 
-    while(true) {
-        auto target = bfs();
-        if(target.first == -1) break; // 더 이상 먹을 물고기 없음
+		sharkY = y; sharkX = x;
+		answer += dist;
+		ate++;
 
-        // 물고기 먹기
-        sy = target.first; 
-        sx = target.second;
-        graph[sy][sx] = 0;
-        eatCount++;
-
-        if(eatCount == sharkSize) { // 상어 크기 업그레이드
-            sharkSize++;
-            eatCount = 0;
-        }
-    }
-
-    cout << totalTime << "\n";
+		if (ate == sharkSize) {
+			sharkSize++;
+			ate = 0;
+		}
+	}
+	cout << answer << "\n";
 }
