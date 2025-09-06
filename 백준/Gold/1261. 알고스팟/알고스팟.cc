@@ -1,64 +1,43 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <queue>
+#include <bits/stdc++.h>
 using namespace std;
 
-int M, N;
-int dx[4] = { 1,-1,0,0 };
-int dy[4] = { 0,0,1,-1 };
+int dy[4] = { 1,-1,0,0 };
+int dx[4] = { 0,0,1,-1 };
 
-int d[100][100];
-string board[100];
-int answer = 1e9;
-queue<pair<int, int>> q;
-
-
-void solve(int x, int y) {
-
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < M; j++) {
-            d[i][j] = 1e9;
-        }
-    }
-
-    d[x][y] = 0;
-
-    q.push({ x,y });
-
-    while (!q.empty()) {
-        auto cur = q.front();
-        q.pop();
-        for (int i = 0; i < 4; i++) {
-            int nx = cur.first + dx[i];
-            int ny = cur.second + dy[i];
-            if (nx < 0 || nx >= N || ny < 0 || ny >= M) continue;
-
-            if (board[nx][ny] == '0') {
-                if (d[nx][ny] > d[cur.first][cur.second]) {
-                    d[nx][ny] = d[cur.first][cur.second];
-                    q.push({ nx,ny });
-                }
-            }
-            else {
-                if (d[nx][ny] > d[cur.first][cur.second] + 1) {
-                    d[nx][ny] = d[cur.first][cur.second] + 1;
-                    q.push({ nx,ny });
-                }
-            }
-        }
-    }
-}
 int main() {
+    int M, N;
+    cin >> M >> N; // ⚠️ M=가로, N=세로
 
-    cin >> M >> N;
+    vector<vector<int>> graph(N, vector<int>(M));
     for (int i = 0; i < N; i++) {
-        cin >> board[i];
+        string s; cin >> s;
+        for (int j = 0; j < M; j++) {
+            graph[i][j] = s[j] - '0';
+        }
     }
 
-    solve(0, 0);
+    deque<pair<int, int>> dq;
+    vector<vector<int>> dist(N, vector<int>(M, 1e9));
 
+    dist[0][0] = 0;
+    dq.push_front({ 0,0 });
 
-    cout << d[N - 1][M - 1];
-    return 0;
+    while (!dq.empty()) {
+        auto [y, x] = dq.front(); dq.pop_front();
+
+        for (int d = 0; d < 4; d++) {
+            int ny = y + dy[d];
+            int nx = x + dx[d];
+            if (ny < 0 || ny >= N || nx < 0 || nx >= M) continue;
+
+            int cost = dist[y][x] + graph[ny][nx];
+            if (cost < dist[ny][nx]) {
+                dist[ny][nx] = cost;
+                if (graph[ny][nx] == 0) dq.push_front({ ny,nx });
+                else dq.push_back({ ny,nx });
+            }
+        }
+    }
+
+    cout << dist[N - 1][M - 1] << "\n";
 }
