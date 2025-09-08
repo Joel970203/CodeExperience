@@ -3,35 +3,34 @@
 
 using namespace std;
 
-int N, S;
-vector<int> arr;
 int cnt = 0;
 
-// 백트래킹 함수
-void backtrack(int index, int current_sum) {
-    // 부분 수열의 크기가 0보다 커야 하므로, 합이 S가 될 때만 카운트
-    if (index > 0 && current_sum == S) {
-        cnt++;
-    }
+// idx: 현재 인덱스, sum: 현재까지 합
+void backtrack(int idx, int sum, const vector<int>& arr, int target) {
+	if (idx == arr.size()) {
+		if (sum == target)
+			cnt++;
+		return;
+	}
 
-    for (int i = index; i < N; i++) {
-        // 현재 원소를 포함시키고 재귀 호출
-        backtrack(i + 1, current_sum + arr[i]);
-    }
+	// 현재 원소 포함
+	backtrack(idx + 1, sum + arr[idx], arr, target);
+
+	// 현재 원소 미포함
+	backtrack(idx + 1, sum, arr, target);
 }
 
 int main() {
-    cin >> N >> S;
-    arr.resize(N);
+	int N, S;
+	cin >> N >> S;
+	vector<int> arr(N);
+	for (int i = 0; i < N; i++)
+		cin >> arr[i];
 
-    for (int i = 0; i < N; i++) {
-        cin >> arr[i];
-    }
+	backtrack(0, 0, arr, S);
 
-    // 백트래킹 시작 (인덱스 0, 현재 합 0)
-    backtrack(0, 0);
+	// 공집합 제외
+	if (S == 0) cnt--;
 
-    cout << cnt << endl; // 결과 출력
-
-    return 0;
+	cout << cnt << '\n';
 }
