@@ -1,47 +1,41 @@
+#include <string>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
 #include <vector>
 #include <queue>
 using namespace std;
 
 int solution(int bridge_length, int weight, vector<int> truck_weights) {
-    int time = 0;  
-    int current_weight = 0; 
-    queue<pair<int, int>> bridge;  // 다리를 건너는 트럭 {무게, 남은 시간}
+    queue<int> bridge;
+    int cur_weight = 0;
+    int time = 0;
+    int idx = 0;
 
-    int i = 0;  // 대기 트럭의 인덱스
-    while (true) 
-    {
+    // 처음엔 다리가 비어있으니 0으로 채워두는 방식 (선택)
+    for (int i = 0; i < bridge_length; i++) bridge.push(0);
+
+    while (idx < (int)truck_weights.size()) {
         time++;
-        // 1. 다리를 건너는 트럭의 남은 시간을 감소
-        if (!bridge.empty() && bridge.front().second == 0) 
-        {
-            current_weight -= bridge.front().first;  // 다리를 건넌 트럭 무게 제거
-            bridge.pop();
-        }
 
-        // 2. 대기 트럭이 다리에 올라갈 수 있는지 확인
-        if (i < truck_weights.size() && current_weight + truck_weights[i] <= weight && bridge.size() < bridge_length) 
-        {
-            bridge.push({truck_weights[i], bridge_length});  // 트럭을 다리에 올림
-            current_weight += truck_weights[i];  // 다리 위 무게 갱신
-            i++;  // 대기 트럭 인덱스 증가
-        }
+        // 1) 한 칸 전진: 앞에서 빠져나감
+        cur_weight -= bridge.front();
+        bridge.pop();
 
-        // 3. 모든 트럭이 다리를 건넜다면 종료
-        if (bridge.empty() && i >= truck_weights.size()) 
-        {
-            break;
+        // 2) 다음 트럭을 올릴 수 있나?
+        int next = truck_weights[idx];
+        if (cur_weight + next <= weight) {
+            bridge.push(next);
+            cur_weight += next;
+            idx++;               //  트럭을 실제로 올렸을 때만 idx 증가
+        } else {
+            bridge.push(0);      //  못 올리면 빈 칸(0) 넣어서 시간만 흐르게
         }
-
-        // 4. 다리 위 트럭의 남은 시간을 처리
-        queue<pair<int, int>> temp_bridge;
-        while (!bridge.empty()) 
-        {
-            auto truck = bridge.front();
-            bridge.pop();
-            temp_bridge.push({truck.first, truck.second - 1});
-        }
-        swap(bridge, temp_bridge);
     }
 
+    // 마지막 트럭이 올라간 뒤 다리를 빠져나가는 시간
+    time += bridge_length;
     return time;
 }
