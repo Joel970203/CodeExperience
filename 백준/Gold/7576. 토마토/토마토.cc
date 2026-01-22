@@ -4,73 +4,92 @@
 
 using namespace std;
 
-int dx[4] = { 1, -1, 0, 0 };
-int dy[4] = { 0, 0, 1, -1 };
+int N, M;
+vector<vector<int>> arr;
+vector<vector<bool>> visited;
+int dx[4] = { 1,-1,0,0 };
+int dy[4] = { 0,0,1,-1 };
+int ans = 0;
+int conquer = 0;
+int tot = 0;
+/*
+너비 우선 탐색인데, q size에 따라 일수를 체크해야할 문제입니다.
+입력값은 따로 체크할 필요가 없을듯. (1000이하)
+인데, 풀다가 착각한게 토마토는 한군데가 아니라 여러곳에 있을수있는걸 생각해야함
 
-void bfs(vector<vector<int>>& tomato, vector<vector<int>>& days, int max_X, int max_Y) {
-    queue<pair<int, int>> q;
-    
-    // 초기 상태에서 익은 토마토를 큐에 넣습니다.
-    for (int i = 0; i < max_X; i++) {
-        for (int j = 0; j < max_Y; j++) {
-            if (tomato[i][j] == 1) {
-                q.push(make_pair(i, j));
-                days[i][j] = 0; // 익은 토마토가 있는 위치의 날짜는 0으로 설정
-            }
-        }
-    }
+*/
 
-    while (!q.empty()) {
-        int tempX = q.front().first;
-        int tempY = q.front().second;
-        q.pop();
+int BFS(const vector<pair<int,int>> &start)
+{
+	queue<pair<int, int>> q;
+	int sz = start.size();
+	for (int i = 0; i < sz; ++i)
+	{
+		q.push({ start[i].first,start[i].second });
+		tot++;
+	}
 
-        for (int i = 0; i < 4; i++) {
-            int fX = tempX + dx[i];
-            int fY = tempY + dy[i];
+	while (!q.empty())
+	{
+		int qsize = q.size();
 
-            if (fX >= 0 && fX < max_X && fY >= 0 && fY < max_Y) {
-                if (tomato[fX][fY] == 0 && days[fX][fY] == -1) { // 익지 않은 토마토라면
-                    tomato[fX][fY] = 1;
-                    days[fX][fY] = days[tempX][tempY] + 1;
-                    q.push(make_pair(fX, fY));
-                }
-            }
-        }
-    }
+		while (qsize--)
+		{
+			auto [y, x] = q.front(); q.pop();
+
+			for (int i = 0; i < 4; ++i)
+			{
+				int curY = y + dy[i];
+				int curX = x + dx[i];
+
+				if (curY >= 0 && curY < N && curX >= 0 && curX < M)
+				{
+					if (!visited[curY][curX] && arr[curY][curX] == 0)
+					{
+						q.push({ curY,curX });
+						tot++;
+						visited[curY][curX] = 1;
+					}
+				}
+			}
+		}
+
+		if (q.empty()) break;
+		ans++;
+	}
+
+	return ans;
 }
+int main()
+{
+	vector<pair<int, int>> start;
+	cin >> M >> N;
+	arr.resize(N, vector<int>(M));
+	visited.resize(N, vector<bool>(M));
+	conquer = M * N;
 
-int main() {
-    int M, N;
-    cin >> M >> N;
-    vector<vector<int>> tomato(N, vector<int>(M));
-    vector<vector<int>> days(N, vector<int>(M, -1)); // 날짜를 추적하는 배열, 초기값 -1
+	for (int i = 0; i < N; ++i)
+	{
+		for (int j = 0; j < M; ++j)
+		{
+			int k;
+			cin >> k;
+			arr[i][j] = k;
+			if (k==1)
+			{
+				start.push_back({ i,j });
+			}
 
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < M; j++) {
-            cin >> tomato[i][j];
-        }
-    }
+			if (k == -1) conquer--;
+		}
+	}
 
-    bfs(tomato, days, N, M);
 
-    int max_days = 0;
-    bool all_ripe = true;
+	int tmp = BFS(start);
+	
+	if (tot == conquer) cout << tmp << endl;
+	else cout << -1 << endl;
 
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < M; j++) {
-            if (tomato[i][j] == 0) {
-                all_ripe = false;
-            }
-            max_days = max(max_days, days[i][j]);
-        }
-    }
+	return 0;
 
-    if (all_ripe) {
-        cout << max_days << endl;
-    } else {
-        cout << -1 << endl;
-    }
-
-    return 0;
 }
