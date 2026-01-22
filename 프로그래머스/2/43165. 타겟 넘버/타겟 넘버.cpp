@@ -1,20 +1,36 @@
+#include <string>
 #include <vector>
+
 using namespace std;
 
-int answer;
+int answer = 0;
 
-void dfs(const vector<int>& numbers, int idx, int sum, int target)
+/*
+모든 경우의수를 카운팅하는데, 재귀로 풀면될것 같다.
++/- 로 돌리면 될듯 
+*/
+
+void DFS(const vector<int> &arr,int target,int idx,int sum)
 {
-    if (idx == (int)numbers.size()) {
-        if (sum == target) answer++;
-        return;
+    if(idx+1 == (int)arr.size())
+    {
+        if(sum == target)  
+        {
+            answer++;
+            return;
+        }
+        
+        else return;
     }
-    dfs(numbers, idx + 1, sum + numbers[idx], target);
-    dfs(numbers, idx + 1, sum - numbers[idx], target);
+    
+    DFS(arr,target,idx+1,sum+arr[idx+1]);
+    DFS(arr,target,idx+1,sum-arr[idx+1]);
+
+    return;
 }
 
-int solution(vector<int> numbers, int target) {
-    answer = 0;                
-    dfs(numbers, 0, 0, target);
+int solution(vector<int> numbers, int target) 
+{
+    DFS(numbers,target,-1,0);
     return answer;
 }
