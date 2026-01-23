@@ -1,49 +1,57 @@
-#include <iostream>
-#include <queue>
-#include <vector>
-#define fastio() ios::sync_with_stdio(0),cin.tie(0),cout.tie(0);
 
+
+/*
+걷거나, 순간이동을 할 수있다.
+동생을 찾을 수 있는 가장 빠른 시간이 몇초인가 ?
+탐색 bfs 문제 
+*/
+
+#include <iostream>
+#include <vector>
+#include <queue>
 using namespace std;
 
 int N, K;
-vector<bool> visited; // 방문 여부를 체크하는 벡터
-queue<pair<int, int>> q;
-int temp;
-int walk[3] = { 1, -1, 2 };
+int mo[3] = { 1,-1,2 };
+bool visited[100001] = { false };
+int bfs(int start, int target)
+{
+	queue<pair<int, int>> q; // pos,time
+	q.push({ start,0 });
+	visited[start] = true;
 
-int main() {
-    fastio();
-    cin >> N >> K;
+	while (!q.empty())
+	{
+		int p = q.size();
 
-    // 최대 범위를 100000으로 설정하여 모든 경우를 커버
-    visited.resize(100001, false);
+		while (p--)
+		{
+			auto [pos, time] = q.front(); q.pop();
 
-    q.push({ N, 0 });
-    visited[N] = true;
+			if (pos == target) return time;
+			for (int i = 0; i < 3; ++i)
+			{
+				int curPos, curTime;
+				if (i == 2)
+				{
+					curPos = pos * 2;
+				}
 
-    while (!q.empty()) {
-        int x = q.front().first;
-        int y = q.front().second;
-        q.pop();
+				else curPos = pos + mo[i];
 
-        if (x == K) {
-            cout << y << endl;
-            return 0;
-        }
+				if (curPos<0 ||curPos > 100000 || visited[curPos]) continue;
 
-        for (int i = 0; i < 3; i++) {
-            if (i == 2) {
-                temp = x * walk[i];
-            }
-            else {
-                temp = x + walk[i];
-            }
+				visited[curPos] = true;
+				curTime = time + 1;
+				q.push({ curPos,curTime });
 
-            if (temp >= 0 && temp <= 100000 && !visited[temp]) {
-                q.push({ temp, y + 1 });
-                visited[temp] = true;
-            }
-        }
-    }
-    return 0;
+			}
+		}
+	}
+}
+
+int main()
+{
+	cin >> N >> K;
+	cout << bfs(N, K);
 }
