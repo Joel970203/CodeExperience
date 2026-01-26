@@ -1,40 +1,94 @@
 #include <string>
 #include <vector>
-#include <numeric> 
+
 using namespace std;
 
-int solution(vector<int> queue1, vector<int> queue2) 
-{
-    int n = queue1.size();
-    int m = queue2.size();
-    vector<int> all(queue1);
-    all.insert(all.end(), queue2.begin(), queue2.end());
+int solution(vector<int> queue1, vector<int> queue2) {
+    int answer = 0;
+    long long target = 0;
+    long long sum1 = 0 ,sum2 = 0;
+    vector<int> ans;
     
-    long long sum1 = accumulate(queue1.begin(), queue1.end(), 0LL);
-    long long sum2 = accumulate(queue2.begin(), queue2.end(), 0LL);
-    long long total = sum1 + sum2;
-    if (total % 2 != 0) return -1; // 홀수면 불가능
-    
-    long long target = total / 2;
-    int i = 0, j = n; // i: queue1 front, j: queue2 front
-    int limit = 2 * (n + m);
-    int cnt = 0;
-    
-    while (cnt <= limit) {
-        if (sum1 == target) return cnt;
+    for(int i=0;i<queue1.size();++i)
+    {
+        target += queue1[i];
+        sum1 += queue1[i];
+    }
         
-        if (sum1 > target) 
-        { // queue1이 큼 → 하나 빼서 queue2에 넣기
-            sum1 -= all[i % (n + m)];
-            i++;
-        } 
-        else 
-        { // queue2가 큼 → 하나 빼서 queue1에 넣기
-            sum1 += all[j % (n + m)];
-            j++;
-        }
-        cnt++;
+    for(int i=0;i<queue2.size();++i)
+    {
+        target += queue2[i];
+        sum2 += queue2[i];
     }
     
-    return -1;
+    target /= 2;
+    
+    if(sum1 > sum2)
+    {
+        for(int i=0;i<queue2.size();++i)
+        {
+            ans.push_back(queue2[i]);
+        }
+        
+        for(int i=0;i<queue1.size();++i)
+        {
+            ans.push_back(queue1[i]);
+        }
+        
+        int start = 0;
+        int end = queue2.size();
+        
+        for(int j = end; j < queue1.size() + queue2.size(); ++j)
+        {
+            sum2 += ans[j];
+
+            while(sum2 > target)
+            {
+                sum2 -= ans[start];
+                start++;
+                answer++;
+            }     
+            
+            answer++;
+            if(sum2 == target) return answer;
+        }
+        
+        return -1;
+    }
+    
+    else if (sum1 == sum2) return 0;
+    
+    else
+    {
+        for(int i=0;i<queue1.size();++i)
+        {
+            ans.push_back(queue1[i]);
+        }
+        
+        for(int i=0;i<queue2.size();++i)
+        {
+            ans.push_back(queue2[i]);
+        }
+        
+        int start = 0;
+        int end = queue1.size();
+        
+        for(int j = end; j < queue1.size() + queue2.size(); ++j)
+        {
+            
+            sum1 += ans[j];
+            
+            while(sum1 > target)
+            {
+                sum1 -= ans[start];
+                start++;
+                answer++;
+            }
+            
+            answer++;
+            if(sum1 == target) return answer;
+        }
+        
+        return -1; 
+    }
 }
