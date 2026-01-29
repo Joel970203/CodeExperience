@@ -4,48 +4,59 @@
 
 using namespace std;
 
-bool canInstallRouters(const vector<int>& houses, int distance, int C) {
-    int count = 1; // 첫 번째 집에 설치
-    int lastInstalled = houses[0]; // 마지막으로 설치된 공유기의 위치
 
-    for (int i = 1; i < houses.size(); i++) {
-        if (houses[i] - lastInstalled >= distance) {
-            count++;
-            lastInstalled = houses[i];
+vector<int> arr;
+
+bool chk(int mid, int C)
+{
+    int cnt = 1;
+    int last = arr[0];
+
+    for (int i = 1; i < arr.size(); i++)
+    {
+        if (arr[i] - last >= mid)
+        {
+            cnt++;
+            last = arr[i];
         }
     }
 
-    return count >= C;
+    return cnt >= C;
 }
 
-int main() {
+int main() 
+{
     int N, C;
     cin >> N >> C;
 
-    vector<int> houses(N);
-    for (int i = 0; i < N; i++) {
-        cin >> houses[i];
+    arr.resize(N);
+
+    for (int i = 0; i < N; i++)
+    {
+        cin >> arr[i];
     }
 
-    sort(houses.begin(), houses.end());
+    sort(arr.begin(), arr.end());
 
-    int left = 1; // 최소 거리
-    int right = houses[N - 1] - houses[0]; // 최대 거리
-    int answer = 0;
+    int left = 1;
+    int right = arr[N-1] - arr[0];
+    int ans = 0;
 
-    while (left <= right) {
+
+    while (left <= right)
+    {
         int mid = (left + right) / 2;
+        if (chk(mid, C))
+        {
+            ans = mid;
+            left = mid + 1;
+        }
 
-        if (canInstallRouters(houses, mid, C)) {
-            answer = mid; // 이 거리로 설치할 수 있으므로, 결과를 저장
-            left = mid + 1; // 더 큰 거리를 시도
-        }
-        else {
-            right = mid - 1; // 거리를 줄여서 시도
-        }
+        else right = mid - 1;
+       
     }
 
-    cout << answer << endl;
-
+    cout << ans;
     return 0;
+
 }
