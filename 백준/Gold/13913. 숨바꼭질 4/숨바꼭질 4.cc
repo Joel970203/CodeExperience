@@ -1,58 +1,63 @@
-#include <iostream>
 #include <vector>
-#include <queue>
+#include <iostream>
 #include <algorithm>
+#include <queue>
+#include <climits>
 
 using namespace std;
-const int MAX = 100000;
 
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+vector<bool> visited(100001, false);
+vector<int> parent(100001, -1);
 
-    int N, K;
-    cin >> N >> K;
+void BFS(int start, int end)
+{
+	queue<int> q;
+	q.push(start);
+	visited[start] = true;
 
-    vector<int> parent(MAX + 1, -1);
-    vector<int> dist(MAX + 1, -1);
-    queue<int> q;
+	while (!q.empty())
+	{
+		auto location = q.front();
+		q.pop();
+		if (location == end) break;
 
-    q.push(N);
-    dist[N] = 0;
+		for (const auto& next : { location + 1,location - 1, location * 2 })
+		{
+			if (visited[next] == false && next >= 0 && next <= 100000)
+			{
+				visited[next] = true;
+				q.push(next);
+				parent[next] = location;
+			}
+		}
+	}
 
-    while (!q.empty())
-    {
-        int cur = q.front(); q.pop();
-        if (cur == K) break;
+	vector<int> answer;
 
-        for (auto p : { cur - 1,cur + 1,cur * 2 })
-        {
-            if (p < 0 || p > 100000) continue;
-            if (dist[p] != -1) continue;
-            
-            dist[p] = dist[cur] + 1;
-            parent[p] = cur;
-            q.push(p);
-        }
-    }
+	int temp = end;
+	while (temp != -1) 
+	{
+		answer.push_back(temp);
+		temp = parent[temp];
+	}
 
+	reverse(answer.begin(), answer.end());
 
-    cout << dist[K] << endl;
+	cout << answer.size() - 1 << "\n";
+	for (int p : answer) cout << p << " ";
+}
 
-    vector<int> path;
+int main()
+{
+	int N, K;
+	cin >> N >> K;
 
-    for (int i = K; i != -1; i = parent[i])
-    {
-        path.push_back(i);
-    }
+	if (N == K) {
+		cout << 0 << "\n" << N;
+		return 0;
+	}
 
-    reverse(path.begin(), path.end());
+	BFS(N,K);
 
-    for (int i = 0; i < path.size(); i++)
-    {
-        cout << path[i] << " ";
-    }
-
-    return 0;
-
+	return 0;
 }
