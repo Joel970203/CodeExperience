@@ -9,30 +9,28 @@ int main()
 
 	cin >> N >> K;
 
-	vector<pair<int, int>> list(N);
-	vector<int> dp(K + 1, 0);
-	for (int i = 0; i < N; i++) 
+	vector<pair<int, int>> arr;
+	vector<int> DP(K+1, 0);
+	for (int i = 0; i < N; ++i)
 	{
 		int W, V;
 		cin >> W >> V;
-		list[i].first = W;
-		list[i].second = V;
+		arr.push_back({ W,V });
 	}
-	
-	sort(list.begin(), list.end());
 
-	
-	for (int i = 0; i < N; i++)
+	sort(arr.begin(), arr.end());
+
+	for (int i = 0; i < N; ++i)
 	{
-		int W = list[i].first; // 무게
-		int V = list[i].second; // 가치 
+		int W = arr[i].first;
+		int V = arr[i].second;
 
 		for (int j = K; j >= W; j--)
 		{
-			dp[j] = max(dp[j], dp[j - W] + V);
-		}
+			DP[j] = max(DP[j], DP[j - W] + V);
 
+		}
 	}
-	
-	cout << dp[K] << endl;  
+
+	cout << DP[K];
 }
