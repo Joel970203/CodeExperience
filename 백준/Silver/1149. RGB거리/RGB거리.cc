@@ -1,39 +1,38 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
-#define fastio() ios::sync_with_stdio(0),cin.tie(0),cout.tie(0)
 
+#define fastio() ios::sync_with_stdio(0),cin.tie(0),cout.tie(0)
 using namespace std;
 
-int main()
-{
+int main() {
     fastio();
     int N;
     cin >> N;
 
-    vector<int> R(N), G(N), B(N);
-    vector<vector<int>> DP(N, vector<int>(3, 0));
+    // 이전 집까지의 최소 비용을 저장할 변수 3개
+    int prevR, prevG, prevB;
+    
+    // 첫 번째 집의 비용 입력 및 초기화
+    cin >> prevR >> prevG >> prevB;
 
-    for (int i = 0; i < N; i++)
-    {
-        cin >> R[i] >> G[i] >> B[i];
+    for (int i = 1; i < N; i++) {
+        int currR, currG, currB; // 현재 집의 비용
+        int r, g, b;            // 현재 집의 각 색상 비용 입력
+        cin >> r >> g >> b;
+
+        // 점화식 적용: 이전 상태의 최솟값 + 현재 색상 비용
+        currR = min(prevG, prevB) + r;
+        currG = min(prevR, prevB) + g;
+        currB = min(prevR, prevG) + b;
+
+        // 다음 집을 위해 현재 결과를 이전 결과로 업데이트
+        prevR = currR;
+        prevG = currG;
+        prevB = currB;
     }
 
-    // 초기화
-    DP[0][0] = R[0];
-    DP[0][1] = G[0];
-    DP[0][2] = B[0];
-
-    for (int i = 1; i < N; i++)
-    {
-        DP[i][0] = min(DP[i - 1][1], DP[i - 1][2]) + R[i]; // 첫 번째 집을 빨강으로 칠하는 비용
-        DP[i][1] = min(DP[i - 1][0], DP[i - 1][2]) + G[i]; // 첫 번째 집을 초록으로 칠하는 비용
-        DP[i][2] = min(DP[i - 1][0], DP[i - 1][1]) + B[i]; // 첫 번째 집을 파랑으로 칠하는 비용
-    }
-
-    // 마지막 집까지의 최소 비용
-    int result = min({ DP[N - 1][0], DP[N - 1][1], DP[N - 1][2] });
-    cout << result << endl;
+    // 마지막에 남은 세 값 중 최솟값이 정답
+    cout << min({prevR, prevG, prevB}) << endl;
 
     return 0;
 }
