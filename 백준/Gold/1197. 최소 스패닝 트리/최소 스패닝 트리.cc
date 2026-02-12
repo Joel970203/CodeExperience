@@ -1,101 +1,82 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#define fastio() ios::sync_with_stdio(0),cin.tie(0),cout.tie(0)
+
+
 using namespace std;
+
+int parent[10001];
 
 struct Edge
 {
-	int u, v, weight;
-	Edge(int u, int v, int weight) : u(u), v(v), weight(weight) {}
+	int u, v, w;
+	bool operator<(const Edge& other) const
+	{
+		return w < other.w;
+	}
 };
 
-bool compare(const Edge& a, const Edge& b)
+
+int Find(int x)
 {
-	return a.weight < b.weight;
+	if (x == parent[x]) return x;
+	return parent[x] = Find(parent[x]);
 }
 
-class UnionFind
+void Union(int a, int b)
 {
-public:
-	vector<int> depth, root;
+	int rootA = Find(a);
+	int rootB = Find(b);
 
-	UnionFind(int n)
+	if (rootA != rootB)
 	{
-		depth.resize(n + 1, 0);
-		root.resize(n + 1);
-		for (int i = 0; i <= n; i++)  
-		{
-			root[i] = i;
-		}
+		parent[rootA] = b;
 	}
-
-	int Find(int x)
-	{
-		if (root[x] == x)
-		{
-			return x;
-		}
-		else
-		{
-			return root[x] = Find(root[x]);
-		}
-	}
-
-	void Union(int x, int y)  
-	{
-		int R_x = Find(x);
-		int R_y = Find(y);
-
-		if (R_x == R_y)  
-		{
-			return;
-		}
-
-		if (depth[R_x] < depth[R_y])  
-		{
-			root[R_x] = R_y;
-		}
-		else if (depth[R_x] > depth[R_y])  
-		{
-			root[R_y] = R_x;
-		}
-		else  
-		{
-			root[R_y] = R_x;
-			depth[R_x]++;
-		}
-	}
-};
+}
 
 int main()
 {
+	fastio();
 	int V, E;
 	cin >> V >> E;
-	vector<Edge> Edges;
-	for (int i = 0; i < E; i++)
+
+	for (int i = 1; i <= V; ++i)
 	{
-		int u, v, weight;
-		cin >> u >> v >> weight;
-		Edges.emplace_back(u, v, weight);
+		parent[i] = i;
 	}
 
-	sort(Edges.begin(), Edges.end(), compare);
+	vector<Edge> edges;
 
-	UnionFind uf(V);
-	long long mstWeight = 0;
-	int cnt = 0;
-
-	for (const auto& edge : Edges)
+	for (int i = 0; i < E; ++i)
 	{
-		if (uf.Find(edge.u) != uf.Find(edge.v))
+		int u, v, w;
+		cin >> u >> v >> w;
+		edges.push_back({ u,v,w });
+	}
+
+	sort(edges.begin(), edges.end());
+
+	long long result = 0;
+	int edgeCount = 0;
+
+	for (int i = 0; i < E; i++)
+	{
+		if (edgeCount == V - 1) break;
+
+		int u = edges[i].u;
+		int v = edges[i].v;
+		int w = edges[i].w;
+
+		if (Find(u) != Find(v))
 		{
-			uf.Union(edge.u, edge.v);
-			mstWeight += edge.weight;
-			cnt++;
-			if (cnt == V - 1) break;  
+			Union(u, v);
+			result += w;
+			edgeCount++;
 		}
 	}
 
-	cout << mstWeight << endl;
+	cout << result << endl;
+
 	return 0;
 }
